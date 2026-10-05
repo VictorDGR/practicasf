@@ -5,7 +5,9 @@
 @section('contenido')
 <h3 class="mb-3">Reporte</h3>
 
-<form method="GET" action="{{ route('admin.reportes.index') }}" class="row g-2 align-items-end mb-4">
+<div class="card mb-4">
+<div class="card-body">
+<form method="GET" action="{{ route('admin.reportes.index') }}" class="row g-3 align-items-end">
 
     {{-- Tipo de reporte --}}
     <div class="col-auto">
@@ -61,6 +63,8 @@
         <button type="submit" formaction="{{ route('admin.reportes.excel') }}" class="btn btn-outline-success">Descargar Excel</button>
     </div>
 </form>
+</div>
+</div>
 
 @include('admin.reportes.resultados')
 

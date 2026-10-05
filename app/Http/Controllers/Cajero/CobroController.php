@@ -34,7 +34,7 @@ class CobroController extends Controller
         ]);
 
         $estudiantes = Estudiante::with(['persona', 'carrera'])->where('estado', 'activo')->get();
-        $arqueo = $request->user()->arqueoAbierto();
+        $turno = $request->user()->turnoAbierto();
 
         $estudiantesJson = $estudiantes->map(function ($estudiante) {
             $apellidos = trim("{$estudiante->persona->ap_paterno} {$estudiante->persona->ap_materno}");
@@ -49,7 +49,7 @@ class CobroController extends Controller
             ];
         });
 
-        return view('cajero.cobros.create', compact('itemsJson', 'estudiantesJson', 'arqueo'));
+        return view('cajero.cobros.create', compact('itemsJson', 'estudiantesJson', 'turno'));
     }
 
     public function store(Request $request)
@@ -63,9 +63,9 @@ class CobroController extends Controller
             'items.*.adicionales.*' => ['integer'],
         ]);
 
-        $arqueo = $request->user()->arqueoAbierto();
+        $turno = $request->user()->turnoAbierto();
 
-        if (! $arqueo) {
+        if (! $turno) {
             return redirect()->route('cajero.caja.apertura');
         }
 
@@ -92,11 +92,12 @@ class CobroController extends Controller
             $lineas[] = compact('item', 'adicionales', 'subtotal');
         }
 
-        $cobro = DB::transaction(function () use ($datos, $request, $arqueo, $lineas, $total) {
+        $cobro = DB::transaction(function () use ($datos, $request, $turno, $lineas, $total) {
             $cobro = Cobro::create([
                 'usuario_id' => $request->user()->id,
                 'estudiante_id' => $datos['estudiante_id'],
-                'arqueo_caja_id' => $arqueo->id,
+                'arqueo_caja_id' => $turno->arqueo_caja_id,
+                'turno_caja_id' => $turno->id,
                 'monto_total' => $total,
                 'tipo_pago' => $datos['tipo_pago'],
                 'fecha_pago' => now(),

@@ -35,7 +35,7 @@ class AuthController extends Controller
     {
         $usuario = $request->user();
         if ($usuario->esCajero() && $usuario->arqueoAbierto()) {
-            return redirect()->route('cajero.caja.cerrar')->with('mensaje', 'Debes cerrar tu caja antes de cerrar sesión.');
+            return redirect()->route('cajero.caja.cerrar')->with('mensaje', 'Debes cerrar tu turno o la caja antes de cerrar sesión.');
         }
         Auth::logout();
 

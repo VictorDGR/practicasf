@@ -40,6 +40,11 @@ class Usuario extends Authenticatable
         return $this->hasMany(ArqueoCaja::class, 'usuario_id');
     }
 
+    public function turnosCaja()
+    {
+        return $this->hasMany(TurnoCaja::class, 'usuario_id');
+    }
+
     public function cobros()
     {
         return $this->hasMany(Cobro::class, 'usuario_id');
@@ -60,9 +65,14 @@ class Usuario extends Authenticatable
         return $this->rol->tipo === 'cajero';
     }
 
+    public function turnoAbierto()
+    {
+        return $this->turnosCaja()->where('estado', 'abierto')->latest('fecha_inicio')->first();
+    }
+
     public function arqueoAbierto()
     {
-        return $this->arqueosCaja()->where('estado', 'abierto')->latest('fecha_apertura')->first();
+        return $this->turnoAbierto()?->arqueoCaja;
     }
 
     public function rutaInicio(): string
@@ -70,7 +80,7 @@ class Usuario extends Authenticatable
         return match ($this->rol->tipo) {
             'super_admin' => 'superadmin.usuarios.index',
             'admin' => 'admin.items.index',
-            'cajero' => $this->arqueoAbierto() ? 'cajero.cobros.create' : 'cajero.caja.apertura',
+            'cajero' => $this->turnoAbierto() ? 'cajero.cobros.create' : 'cajero.caja.apertura',
         };
     }
 }

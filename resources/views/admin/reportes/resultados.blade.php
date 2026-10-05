@@ -189,7 +189,8 @@
         <table class="table table-bordered bg-white">
             <thead>
                 <tr>
-                    <th>Cajero</th>
+                    <th>Caja</th>
+                    <th>Cajeros (turnos)</th>
                     <th>Apertura</th>
                     <th>Cierre</th>
                     <th>Monto apertura</th>
@@ -204,7 +205,12 @@
             <tbody>
                 @forelse($arqueos as $arqueo)
                     <tr>
-                        <td>{{ $arqueo->usuario->persona->nombreCompleto() }}</td>
+                        <td>{{ $arqueo->caja?->nombre ?? '—' }}</td>
+                        <td>
+                            @foreach($arqueo->turnos as $turno)
+                                <div>{{ $turno->usuario->persona->nombreCompleto() }} <span class="text-muted">({{ $turno->fecha_inicio->format('H:i') }} - {{ $turno->fecha_fin?->format('H:i') ?? 'en curso' }})</span></div>
+                            @endforeach
+                        </td>
                         <td>{{ $arqueo->fecha_apertura->format('d/m/Y H:i') }}</td>
                         <td>{{ $arqueo->fecha_cierre?->format('d/m/Y H:i') ?? '—' }}</td>
                         <td>{{ number_format($arqueo->monto_apertura, 2) }}</td>
@@ -222,7 +228,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="10" class="text-center">No hay arqueos en el rango seleccionado.</td></tr>
+                    <tr><td colspan="11" class="text-center">No hay arqueos en el rango seleccionado.</td></tr>
                 @endforelse
             </tbody>
         </table>

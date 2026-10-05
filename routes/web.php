@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CajaController as AdminCajaController;
 use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\AuthController;
@@ -61,6 +62,12 @@ Route::prefix('admin')->middleware(['auth', 'rol:super_admin,admin'])->name('adm
     Route::get('/items/{item}/editar', [ItemController::class, 'edit'])->name('items.edit');
     Route::put('/items/{item}', [ItemController::class, 'update'])->name('items.update');
 
+    Route::get('/cajas', [AdminCajaController::class, 'index'])->name('cajas.index');
+    Route::get('/cajas/crear', [AdminCajaController::class, 'create'])->name('cajas.create');
+    Route::post('/cajas', [AdminCajaController::class, 'store'])->name('cajas.store');
+    Route::get('/cajas/{caja}/editar', [AdminCajaController::class, 'edit'])->name('cajas.edit');
+    Route::put('/cajas/{caja}', [AdminCajaController::class, 'update'])->name('cajas.update');
+
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
     Route::get('/reportes/pdf', [ReporteController::class, 'pdf'])->name('reportes.pdf');
     Route::get('/reportes/excel', [ReporteController::class, 'excel'])->name('reportes.excel');
@@ -98,6 +105,7 @@ Route::prefix('cajero')->middleware(['auth', 'rol:cajero'])->name('cajero.')->gr
 
         Route::get('/caja/cierre', [CajaController::class, 'cerrar'])->name('caja.cerrar');
         Route::post('/caja/cierre', [CajaController::class, 'confirmarCierre'])->name('caja.confirmar_cierre');
+        Route::post('/caja/cerrar-turno', [CajaController::class, 'cerrarTurno'])->name('caja.cerrar_turno');
 
         Route::get('/cobros/{cobro}/devolucion/solicitar',[CajeroDevolucionController::class, 'formSolicitar'])->name('cobros.devolucion.form');
         Route::post('/cobros/{cobro}/devolucion/solicitar',[CajeroDevolucionController::class, 'solicitar'])->name('cobros.devolucion.solicitar');

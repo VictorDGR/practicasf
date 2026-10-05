@@ -5,10 +5,11 @@
 @section('contenido')
 <div class="row justify-content-center">
     <div class="col-md-8">
-        @if($arqueo)
+        @if($turno)
             <div class="alert alert-secondary">
-                <strong>Turno abierto desde:</strong> {{ $arqueo->fecha_apertura->format('d/m/Y H:i') }}
-                — <strong>Fondo de apertura:</strong> Bs. {{ number_format($arqueo->monto_apertura, 2) }}
+                <strong>{{ $turno->arqueoCaja->caja->nombre }}</strong>
+                — <strong>Turno desde:</strong> {{ $turno->fecha_inicio->format('d/m/Y H:i') }}
+                — <strong>Recibiste la caja con:</strong> Bs. {{ number_format($turno->monto_inicial, 2) }}
             </div>
         @endif
 

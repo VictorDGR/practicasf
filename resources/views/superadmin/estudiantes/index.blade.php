@@ -20,11 +20,8 @@
     <div class="card-body">
         <h5 class="card-title">Importar desde Excel</h5>
         <p class="text-muted small mb-2">
-            El archivo debe ser <strong>.xlsx</strong> y la primera fila debe tener estas columnas:
-            <code>ci</code>, <code>nombre1</code>, <code>nombre2</code>, <code>apellidop</code>, <code>apellidom</code>, <code>carrera</code>.
-            Opcionalmente puede tener <code>complemento</code> (ej: CI 6565204 con complemento 1B queda como 6565204-1B).
-            Si la carrera no existe se crea sola. Si el CI ya existe se actualizan sus datos, no se duplica.
-        </p>
+        Para la insercion de datos en exel,las columnas deben de estar ci,nombre1,nombre2,apellidop,apellidom,carrera    
+    </p>
         <form method="POST" action="{{ route('superadmin.estudiantes.importar') }}" enctype="multipart/form-data" class="row g-2 align-items-end">
             @csrf
             <div class="col-md-8">
@@ -73,7 +70,6 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="5" class="text-center">No existe registro</td></tr>
             @endforelse
         </tbody>
     </table>

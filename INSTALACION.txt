@@ -1,0 +1,244 @@
+==========================================================
+  UPDS COBROS - GUIA DE INSTALACION EN UNA MAQUINA NUEVA
+==========================================================
+
+Esta guia es para Windows. Sigue los pasos en orden.
+
+
+----------------------------------------------------------
+PASO 0. SUBIR EL PROYECTO A GIT (en tu maquina actual)
+----------------------------------------------------------
+
+Abre una terminal en la carpeta del proyecto y ejecuta:
+
+    git add .
+    git commit -m "Diseño, cajas y turnos"
+    git push
+
+No se suben (y esta bien que no se suban):
+  - la carpeta vendor      -> se descarga con composer install
+  - el archivo .env        -> se crea copiando .env.example
+  - la carpeta backups     -> son copias de la base de datos
+
+
+----------------------------------------------------------
+PASO 1. PROGRAMAS QUE DEBE TENER LA MAQUINA NUEVA
+----------------------------------------------------------
+
+1) XAMPP con PHP 8.2 o mayor
+   Descarga: https://www.apachefriends.org/es/download.html
+   Instalalo en C:\xampp (la ruta por defecto).
+   Trae PHP y MySQL (MariaDB).
+
+2) Composer (instala las librerias de PHP)
+   Descarga: https://getcomposer.org/Composer-Setup.exe
+   Durante la instalacion te pide la ruta de PHP, elige:
+   C:\xampp\php\php.exe
+
+3) Git
+   Descarga: https://git-scm.com/download/win
+
+Para comprobar que todo quedo instalado, abre una terminal
+NUEVA y ejecuta estos tres comandos (cada uno debe mostrar
+una version):
+
+    php -v
+    composer -V
+    git --version
+
+Si "php -v" dice que no se reconoce el comando, agrega
+C:\xampp\php a la variable de entorno PATH de Windows y
+abre otra terminal.
+
+
+----------------------------------------------------------
+PASO 2. ACTIVAR EXTENSIONES DE PHP
+----------------------------------------------------------
+
+Abre el archivo C:\xampp\php\php.ini con el bloc de notas.
+Busca estas lineas y quitales el punto y coma (;) del
+inicio si lo tienen:
+
+    extension=gd          (necesaria para el PDF de reportes)
+    extension=zip         (necesaria para composer)
+    extension=fileinfo    (necesaria para subir el Excel de estudiantes)
+    extension=mbstring
+    extension=pdo_mysql
+    extension=curl
+
+Ejemplo:  ;extension=gd   debe quedar   extension=gd
+
+Guarda el archivo. Si Apache esta encendido en XAMPP,
+apagalo y vuelve a encenderlo.
+
+Para comprobar:   php -m
+En la lista deben aparecer: gd, zip, fileinfo, mbstring,
+pdo_mysql, openssl.
+
+
+----------------------------------------------------------
+PASO 3. DESCARGAR EL PROYECTO
+----------------------------------------------------------
+
+Abre una terminal en la carpeta donde lo quieras guardar
+(por ejemplo C:\proyectos) y ejecuta:
+
+    git clone https://github.com/VictorDGR/practicasf.git
+    cd practicasf
+
+
+----------------------------------------------------------
+PASO 4. INSTALAR LAS LIBRERIAS
+----------------------------------------------------------
+
+Dentro de la carpeta del proyecto ejecuta:
+
+    composer install
+
+Necesita internet. Descarga Laravel, DomPDF (PDF) y
+SimpleXLSX (Excel) dentro de la carpeta vendor.
+
+Si sale un error que nombra una extension (por ejemplo
+"ext-zip" o "ext-gd"), vuelve al PASO 2 y activala.
+
+
+----------------------------------------------------------
+PASO 5. CREAR EL ARCHIVO .env
+----------------------------------------------------------
+
+    copy .env.example .env
+    php artisan key:generate
+
+Abre el archivo .env y revisa estas lineas:
+
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=upds-cobros
+    DB_USERNAME=root
+    DB_PASSWORD=
+    MYSQLDUMP_PATH=C:/xampp/mysql/bin/mysqldump.exe
+
+IMPORTANTE sobre DB_PORT:
+  - XAMPP normalmente usa el puerto 3306.
+  - En la maquina original se usaba 3307.
+  - Mira el puerto que muestra el panel de XAMPP al lado de
+    MySQL y pon ese mismo numero.
+
+MYSQLDUMP_PATH se usa para la seccion Backups. Si XAMPP no
+esta en C:\xampp, cambia la ruta.
+
+
+----------------------------------------------------------
+PASO 6. CREAR LA BASE DE DATOS
+----------------------------------------------------------
+
+Primero enciende MySQL desde el panel de XAMPP (boton Start).
+
+Elige UNA de estas dos opciones:
+
+OPCION A (recomendada) - con los comandos de Laravel
+
+  1) Entra a http://localhost/phpmyadmin
+  2) Crea una base de datos llamada:  upds-cobros
+     Cotejamiento: utf8mb4_unicode_ci
+  3) En la terminal, dentro del proyecto:
+
+         php artisan migrate --seed
+
+     Esto crea todas las tablas, los roles y el usuario
+     superadmin.
+
+OPCION B - con el archivo upds-cobros.txt
+
+  1) Entra a http://localhost/phpmyadmin
+  2) Pestaña SQL, pega todo el contenido de upds-cobros.txt
+     y pulsa Continuar. (Crea la base y las tablas solo.)
+  3) En la terminal, dentro del proyecto:
+
+         php artisan db:seed --class=SuperAdminSeeder
+
+NUNCA ejecutes "php artisan migrate:fresh" cuando ya tengas
+datos: borra todas las tablas y todo lo registrado.
+Cuando haya cambios nuevos en el proyecto, solo usa:
+
+    php artisan migrate
+
+
+----------------------------------------------------------
+PASO 7. INICIAR EL SISTEMA
+----------------------------------------------------------
+
+    php artisan serve
+
+Abre en el navegador:   http://127.0.0.1:8000
+
+Usuario inicial:
+    Usuario:     superadmin
+    Contraseña:  superadmin
+
+Cambia esa contraseña apenas entres (menu Usuarios).
+
+La terminal donde corre "php artisan serve" debe quedarse
+abierta mientras se use el sistema. Para apagarlo: Ctrl+C.
+
+
+----------------------------------------------------------
+PASO 8. PRIMERA CONFIGURACION DENTRO DEL SISTEMA
+----------------------------------------------------------
+
+Con el usuario superadmin:
+
+  1) Carreras      -> crear las carreras
+  2) Estudiantes   -> importar el Excel de estudiantes
+  3) Usuarios      -> crear los administradores y cajeros
+  4) Cajas         -> crear las cajas (Caja 1, Caja 2, ...)
+  5) Items         -> crear los conceptos de cobro
+
+Despues el cajero ya puede iniciar sesion, elegir su caja
+y empezar a cobrar.
+
+
+----------------------------------------------------------
+ERRORES COMUNES
+----------------------------------------------------------
+
+"The PHP GD extension is required"
+    -> Falta extension=gd en php.ini (PASO 2). Despues
+       apaga "php artisan serve" con Ctrl+C y vuelve a
+       iniciarlo.
+
+"SQLSTATE[HY000] [2002] No connection could be made"
+    -> MySQL esta apagado en XAMPP, o DB_PORT en .env no es
+       el correcto (PASO 5).
+
+"SQLSTATE[HY000] [1049] Unknown database 'upds-cobros'"
+    -> No se creo la base de datos (PASO 6).
+
+"Base table or view not found" / "Table ... doesn't exist"
+    -> Faltan tablas. Ejecuta:  php artisan migrate
+
+"No application encryption key has been specified"
+    -> Ejecuta:  php artisan key:generate
+
+"vendor/autoload.php: Failed to open stream"
+    -> No se instalaron las librerias. Ejecuta:
+       composer install
+
+Los estilos o cambios no se ven
+    -> Recarga el navegador con Ctrl+F5.
+    -> Si sigue igual:  php artisan optimize:clear
+
+El boton de Backups da error
+    -> Revisa MYSQLDUMP_PATH en .env (PASO 5).
+
+
+----------------------------------------------------------
+ACTUALIZAR LA MAQUINA CUANDO HAYA CAMBIOS NUEVOS EN GIT
+----------------------------------------------------------
+
+Dentro de la carpeta del proyecto:
+
+    git pull
+    composer install
+    php artisan migrate
+    php artisan optimize:clear

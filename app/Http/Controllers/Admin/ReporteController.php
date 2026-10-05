@@ -133,10 +133,11 @@ class ReporteController extends Controller
             $filas[] = ['Total recaudado (Bs.)', (float) $d['totalRecaudado']];
             $filas[] = ['Diferencia acumulada (Bs.)', (float) $d['totalDiferencia']];
             $filas[] = [];
-            $filas[] = $this->negrita(['Cajero', 'Apertura', 'Cierre', 'Monto apertura', 'Sistema', 'Físico', 'Diferencia', 'Pagados', 'Anulados', 'Estado']);
+            $filas[] = $this->negrita(['Caja', 'Cajeros', 'Apertura', 'Cierre', 'Monto apertura', 'Sistema', 'Físico', 'Diferencia', 'Pagados', 'Anulados', 'Estado']);
             foreach ($d['arqueos'] as $arqueo) {
                 $filas[] = [
-                    $arqueo->usuario->persona->nombreCompleto(),
+                    $arqueo->caja?->nombre ?? '',
+                    $arqueo->turnos->map(fn ($turno) => $turno->usuario->persona->nombreCompleto())->unique()->implode(', '),
                     $arqueo->fecha_apertura->format('d/m/Y H:i'),
                     $arqueo->fecha_cierre?->format('d/m/Y H:i') ?? '',
                     (float) $arqueo->monto_apertura,
@@ -264,7 +265,7 @@ class ReporteController extends Controller
 
     private function reporteArqueos(Carbon $desde, Carbon $hasta): array
     {
-        $arqueos = ArqueoCaja::with('usuario.persona')
+        $arqueos = ArqueoCaja::with(['caja', 'usuario.persona', 'turnos.usuario.persona'])
             ->withCount([
                 'cobros as cobros_pagados'  => fn($q) => $q->where('estado', 'pagado'),
                 'cobros as cobros_anulados' => fn($q) => $q->where('estado', 'anulado'),

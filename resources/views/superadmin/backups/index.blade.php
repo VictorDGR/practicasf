@@ -7,12 +7,9 @@
     <h3>Backups de la base de datos</h3>
     <form method="POST" action="{{ route('superadmin.backups.crear') }}">
         @csrf
-        <button type="submit" class="btn btn-primary">Crear backup ahora</button>
+        <button type="submit" class="btn btn-primary">Crear nuevo backup</button>
     </form>
 </div>
-
-<p class="text-muted">Los backups se guardan en la carpeta <code>backups</code> del proyecto.</p>
-
 <table class="table table-bordered bg-white">
     <thead>
         <tr>
@@ -38,7 +35,6 @@
                 </td>
             </tr>
         @empty
-            <tr><td colspan="4" class="text-center">Todavía no hay backups</td></tr>
         @endforelse
     </tbody>
 </table>

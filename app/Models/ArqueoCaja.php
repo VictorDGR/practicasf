@@ -9,6 +9,7 @@ class ArqueoCaja extends Model
     protected $table = 'arqueos_caja';
 
     protected $fillable = [
+        'caja_id',
         'usuario_id',
         'monto_apertura',
         'fecha_apertura',
@@ -27,6 +28,21 @@ class ArqueoCaja extends Model
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');
+    }
+
+    public function caja()
+    {
+        return $this->belongsTo(Caja::class, 'caja_id');
+    }
+
+    public function turnos()
+    {
+        return $this->hasMany(TurnoCaja::class, 'arqueo_caja_id');
+    }
+
+    public function turnoAbierto()
+    {
+        return $this->turnos()->where('estado', 'abierto')->latest('fecha_inicio')->first();
     }
 
     public function cobros()

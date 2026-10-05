@@ -13,6 +13,7 @@ class Cobro extends Model
         'usuario_id',
         'estudiante_id',
         'arqueo_caja_id',
+        'turno_caja_id',
         'monto_total',
         'tipo_pago',
         'fecha_pago',
@@ -36,6 +37,11 @@ class Cobro extends Model
     public function arqueoCaja()
     {
         return $this->belongsTo(ArqueoCaja::class, 'arqueo_caja_id');
+    }
+
+    public function turnoCaja()
+    {
+        return $this->belongsTo(TurnoCaja::class, 'turno_caja_id');
     }
 
     public function detallePagos()
